@@ -3,7 +3,7 @@ Forward and Backward of DyT
 """
 import torch
 import torch.nn as nn
-from .kernels import dyt_triton_forward, dyt_triton_backward
+from .triton_ops import dyt_triton_forward, dyt_triton_backward
 import dyt_cuda
 
 class DyTFunctionCuda(torch.autograd.Function):

@@ -48,7 +48,7 @@ def patch_model(model, backend='torch'):
     config = model.config
 
     for i in range(len(model.wav2vec2.encoder.layers)):
-        dyt_layer = Wav2Vec2EncoderLayer(config, backend=backend)
+        dyt_layer = Wav2VecDyT(config, backend=backend)
         model.wav2vec2.encoder.layers[i] = dyt_layer
     
     return model

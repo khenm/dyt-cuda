@@ -8,7 +8,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from transformers import Wav2Vec2Config, Wav2Vec2ForPreTraining
-from dyt_wav2vec import patch_model
+from .dyt_wav2vec import patch_model
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ def run_benchmark(backend='torch', batch_size=4, seq_secs=5, steps=50):
     model = Wav2Vec2ForPreTraining(config)
 
     if backend in ['cuda', 'triton', 'torch']:
-        model = patch_model(model, backen=backend)
+        model = patch_model(model, backend=backend)
     else:
         logger.info("Using default torch backend")
     
@@ -73,7 +73,7 @@ def run_benchmark(backend='torch', batch_size=4, seq_secs=5, steps=50):
     
     torch.cuda.synchronize()
 
-    logger.info(f"Benchmark {benchmark.upper()} for {steps} steps...")
+    logger.info(f"Benchmark {backend.upper()} for {steps} steps...")
     start_event = torch.cuda.Event(enable_timing=True)
     end_event = torch.cuda.Event(enable_timing=True)
 
@@ -111,7 +111,7 @@ def run_benchmark(backend='torch', batch_size=4, seq_secs=5, steps=50):
         "Backend": backend,
         "Throughput (GB/s)": throughput,
         "Peak VRAM (GB)": max_mem,
-        "Avg Loss", avg_loss
+        "Avg Loss": avg_loss
     }
 
 def plot_performance(df, metric_name='Avg Loss', save_path='./results/dyt_benchmark_results.png'):

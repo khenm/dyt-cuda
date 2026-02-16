@@ -33,8 +33,8 @@ def get_inputs(N, num_features, device='cuda'):
     return x, model, alpha, weight, bias
 
 
-@triton.testing.perf_report(
-    triton.testing.Benchmark(
+@triton.testing.perf_report([
+    triton.testing.Benchmark( # n-scaling
         x_names=['N'],
         x_vals=[128 * 2 ** i for i in range(0, 10)],
         line_arg='provider',
@@ -45,8 +45,19 @@ def get_inputs(N, num_features, device='cuda'):
         ylabel='Throughput (Gb/s)',
         xlabel='Input Size (N)',
         args={'num_features': 4096}
+    ), 
+    triton.testing.Benchmark( # feature-scaling
+        x_names=['num_features'],
+        x_vals=[512 * 2 ** i for i in range(0, 8)], 
+        line_arg='provider', 
+        line_vals=['torch', 'triton', 'cuda'], 
+        line_names=['PyTorch', 'Triton', 'CUDA'],
+        styles=[('blue', '-'), ('green', '-'), ('red', '-')],
+        ylabel='Throughput (GB/s)', 
+        plot_name='dyt-performance-feature-scaling',
+        args={'N': 4096}
     )
-)
+])
 def benchmark(N, num_features, provider):
     x, model, alpha, weight, bias = get_inputs(N, num_features)
     quantiles = [0.5, 0.2, 0.8]
@@ -63,7 +74,7 @@ def benchmark(N, num_features, provider):
        gbps = total_bytes * 1e-9 / (ms * 1e-3)
        return gbps
    
-    return gbps(ms), gbps(min_ms), gbps(max_ms)
+    return gbps(ms), gbps(max_ms), gbps(min_ms)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="DyT Benchmark")

@@ -44,7 +44,6 @@ def get_inputs(N, num_features, device='cuda'):
         styles=[('blue', '-'), ('green', '-'), ('red', '-')],
         ylabel='Latency (ms)',
         xlabel='Input Size (N)',
-        title='DyT Performance Comparison',
         args={'num_features': 4096}
     )
 )

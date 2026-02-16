@@ -9,12 +9,13 @@ setup(
             name="dyt_cuda", 
             sources=[
                 "csrc/bindings.cpp", 
-                "csrc/kernels.cu"
+                "csrc/kernels.cu",
             ], 
             extra_compile_args={
                 'cxx': ['-O3'],
                 'nvcc': ['-O3']
-            }
+            },
+            include_dirs=["csrc"]
         )
     ],
     cmdclass={"build_ext": BuildExtension},

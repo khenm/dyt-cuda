@@ -1,7 +1,7 @@
 /*
 DyT implemented with CUDA
 */
-#include <cuda.h>
+#include "dyt.h"
 #include <cuda_runtime.h>
 #include <torch/extension.h>
 

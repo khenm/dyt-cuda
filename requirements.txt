@@ -5,3 +5,5 @@ triton
 black
 flake8
 flake8-pyproject
+matplotlib
+seaborn

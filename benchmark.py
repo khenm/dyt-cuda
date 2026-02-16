@@ -63,7 +63,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="DyT Benchmark")
     parser.add_argument("--num_features", type=int, default=4096)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--save-dir", type=str, default="./results")
     args = parser.parse_args()
     seed_everything(args.seed)
-    benchmark.run(print_data=True, show_plots=True, save_path="./results")
+    os.makedirs(args.save_dir, exist_ok=True)
+    benchmark.run(print_data=True, show_plots=True, save_path=args.save_dir)
     

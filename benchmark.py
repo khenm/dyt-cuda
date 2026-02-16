@@ -34,7 +34,7 @@ def get_inputs(N, num_features, device='cuda'):
 
 
 @triton.testing.perf_report(
-    triton.testing.benchmark(
+    triton.testing.Benchmark(
         x_names=['N'],
         x_vals=[128 * 2 ** i for i in range(0, 8)],
         line_arg='provider',
@@ -50,7 +50,7 @@ def get_inputs(N, num_features, device='cuda'):
 )
 def benchmark(N, num_features, provider):
     x, model, alpha, weight, bias = get_inputs(N, num_features)
-    quantiles = [0.2, 0.5, 0.8]
+    quantiles = [0.5, 0.2, 0.8]
     
     if provider == 'torch':
        return triton.testing.do_bench(lambda: model(x), quantiles=quantiles)

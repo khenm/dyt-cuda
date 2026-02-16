@@ -28,7 +28,7 @@ def dyt_kernel(
     bias = tl.load(bias_ptr + feat_offsets, mask=mask)
     
     activated = tl.tanh(x * alpha)
-    result = tl.dot(activated, weight) + bias
+    result = activated * weight + bias
     tl.store(out_ptr + offsets, result, mask=mask)
     
 
@@ -37,7 +37,7 @@ def dyt_triton(x: torch.Tensor, alpha: torch.Tensor, weight: torch.Tensor, bias:
     num_features = x.size(-1)
     out = torch.empty_like(x)
 
-    grid = lambda meta: (triton.cdiv(n_elements, meta["BLOCK_SIZE"]))
+    grid = lambda meta: (triton.cdiv(n_elements, meta["BLOCK_SIZE"]), )
 
     dyt_kernel[grid](
         x, out, alpha,

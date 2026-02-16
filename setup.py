@@ -6,7 +6,7 @@ setup(
     version='0.1.0',
     ext_modules=[
         CUDAExtension(
-            name="dyt_cuda", 
+            name="dyt", 
             sources=[
                 "csrc/bindings.cpp", 
                 "csrc/kernels.cu"

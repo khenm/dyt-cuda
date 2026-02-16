@@ -162,33 +162,33 @@ def plot_performance(df, metric_name='Avg Loss', save_path='./results/dyt_benchm
                     fontsize=12, fontweight='bold', color='black'
                 )
 
-        sns.barplot(data=df, x='Backend', y='Throughput (GB/s)', ax=axes[0], palette=palette, hue='Backend', legend=False)
-        axes[0].set_title("Training Speed\n(↑)", fontweight='bold', pad=15)
-        axes[0].set_ylabel("Audio Seconds / Sec")
-        axes[0].set_xlabel("")
-        add_labels(axes[0])
+    sns.barplot(data=df, x='Backend', y='Throughput (GB/s)', ax=axes[0], palette=palette, hue='Backend', legend=False)
+    axes[0].set_title("Training Speed\n(↑)", fontweight='bold', pad=15)
+    axes[0].set_ylabel("Audio Seconds / Sec")
+    axes[0].set_xlabel("")
+    add_labels(axes[0])
 
-        sns.barplot(data=df, x='Backend', y='Peak VRAM (GB)', ax=axes[1], palette=palette, hue='Backend', legend=False)
-        axes[1].set_title("Peak Memory Footprint\n(↓)", fontweight='bold', pad=15)
-        axes[1].set_ylabel("Peak VRAM (GB)")
-        axes[1].set_xlabel("")
-        add_labels(axes[1])
+    sns.barplot(data=df, x='Backend', y='Peak VRAM (GB)', ax=axes[1], palette=palette, hue='Backend', legend=False)
+    axes[1].set_title("Peak Memory Footprint\n(↓)", fontweight='bold', pad=15)
+    axes[1].set_ylabel("Peak VRAM (GB)")
+    axes[1].set_xlabel("")
+    add_labels(axes[1])
 
-        is_loss = 'loss' in metric_name.lower()
-        direction = "(↓)" if is_loss else "(↑)"
-    
-        sns.barplot(data=df, x='Backend', y=metric_name, ax=axes[2], palette=palette, hue='Backend', legend=False)
-        axes[2].set_title(f"Model Stability: {metric_name}\n{direction}", fontweight='bold', pad=15)
-        axes[2].set_ylabel(metric_name)
-        axes[2].set_xlabel("")
+    is_loss = 'loss' in metric_name.lower()
+    direction = "(↓)" if is_loss else "(↑)"
 
-        if is_loss:
-            min_val = df[metric_name].min()
-            max_val = df[metric_name].max()
-            margin = (max_val - min_val) * 2
-            if margin == 0: margin = 0.1 * max_val
+    sns.barplot(data=df, x='Backend', y=metric_name, ax=axes[2], palette=palette, hue='Backend', legend=False)
+    axes[2].set_title(f"Model Stability: {metric_name}\n{direction}", fontweight='bold', pad=15)
+    axes[2].set_ylabel(metric_name)
+    axes[2].set_xlabel("")
 
-        add_labels(axes[2], is_loss=is_loss)
+    if is_loss:
+        min_val = df[metric_name].min()
+        max_val = df[metric_name].max()
+        margin = (max_val - min_val) * 2
+        if margin == 0: margin = 0.1 * max_val
 
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        logger.info(f"Plot saved to {save_path}")
+    add_labels(axes[2], is_loss=is_loss)
+
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    logger.info(f"Plot saved to {save_path}")

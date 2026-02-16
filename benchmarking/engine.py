@@ -59,16 +59,28 @@ def run_benchmark(backend='torch', batch_size=4, seq_secs=5, steps=50):
 
     inputs = get_librispeech_batch(batch_size, max_secs=seq_secs).to(device)
 
-    # wav2vec2 down by 320
     feature_len = model.wav2vec2._get_feat_extract_output_lengths(inputs.shape[1])
     mask_time_indices = torch.randint(0, 2, (inputs.shape[0], feature_len), device=device, dtype=torch.bool)
+    
+    num_negatives = model.config.num_negatives
+    sampled_negative_indices = torch.randint(
+        0, feature_len,
+        (inputs.shape[0], feature_len, num_negatives),
+        device=device,
+        dtype=torch.long
+    )
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
 
     # warmup
     logger.info("Warm up epochs...")
-    for _ in range(5):
-        loss = model(inputs, mask_time_indices=mask_time_indices).loss
+    for i in range(5):
+        outputs = model(
+            inputs, 
+            mask_time_indices=mask_time_indices,
+            sampled_negative_indices=sampled_negative_indices
+        )
+        loss = outputs.loss
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
@@ -83,7 +95,11 @@ def run_benchmark(backend='torch', batch_size=4, seq_secs=5, steps=50):
 
     start_event.record()
     for _ in range(steps):
-        outputs = model(inputs, mask_time_indices=mask_time_indices)
+        outputs = model(
+            inputs, 
+            mask_time_indices=mask_time_indices,
+            sampled_negative_indices=sampled_negative_indices
+        )
         loss = outputs.loss
         loss.backward()
         optimizer.step()
@@ -102,7 +118,7 @@ def run_benchmark(backend='torch', batch_size=4, seq_secs=5, steps=50):
     throughput = audio_seconds_processed / seconds
     avg_loss = total_loss / steps
 
-    logger.info(f"Benchmark {benchmark.upper()} completed in {seconds:.2f} seconds")
+    logger.info(f"Benchmark {backend.upper()} completed in {seconds:.2f} seconds")
     logger.info(f"Throughput: {throughput:.2f} audio seconds per second")
 
     max_mem = torch.cuda.max_memory_allocated() / 1e9

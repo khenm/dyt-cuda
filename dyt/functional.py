@@ -15,7 +15,8 @@ class DyTFunctionCuda(torch.autograd.Function):
     @staticmethod
     def backward(ctx, grad_output):
         x, alpha, weight, bias = ctx.saved_tensors
-        return dyt_cuda.backward(grad_output, x, alpha, weight)
+        grads = dyt_cuda.backward(grad_output, x, alpha, weight)
+        return tuple(grads)
 
 class DyTFunctionTriton(torch.autograd.Function):
     @staticmethod
@@ -26,4 +27,5 @@ class DyTFunctionTriton(torch.autograd.Function):
     @staticmethod
     def backward(ctx, grad_output):
         x, alpha, weight, bias = ctx.saved_tensors
-        return dyt_triton_backward(grad_output, x, alpha, weight)
+        grads = dyt_triton_backward(grad_output, x, alpha, weight)
+        return tuple(grads)

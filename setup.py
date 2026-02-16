@@ -12,8 +12,8 @@ setup(
                 "csrc/kernels.cu"
             ], 
             extra_compile_args={
-                'cxx': ['-03'],
-                'nvcc': ['-03']
+                'cxx': ['-O3'],
+                'nvcc': ['-O3']
             }
         )
     ],

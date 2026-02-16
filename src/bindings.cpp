@@ -39,10 +39,10 @@ std::vector<torch::Tensor> dyt_backward(torch::Tensor grad_output, torch::Tensor
     auto alpha_c = alpha.contiguous();
     auto weight_c = weight.contiguous();
 
-    auto grad_x = torch::empty_like(x_c);
-    auto grad_alpha = torch::empty_like(alpha_c);
-    auto grad_weight = torch::empty_like(weight_c);
-    auto grad_bias = torch::empty_like(bias_c);
+    auto grad_x = torch::zeros_like(x_c);
+    auto grad_alpha = torch::zeros_like(alpha_c);
+    auto grad_weight = torch::zeros_like(weight_c);
+    auto grad_bias = torch::zeros_like(weight_c);
 
     dyt_launch_backward(grad_output_c, x_c, alpha_c, weight_c, grad_x, grad_alpha, grad_weight, grad_bias);
     return {grad_x, grad_alpha, grad_weight, grad_bias};

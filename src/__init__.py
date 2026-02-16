@@ -1,4 +1,5 @@
 from .torch import DyT
-from .kernels import dyt_triton
+from .function import DyTFunctionCuda, DyTFunctionTriton
+from .kernels import dyt_triton_forward, dyt_triton_backward
 
-__all__ = ["DyT", "dyt_triton"]
+__all__ = ["DyT", "DyTFunctionCuda", "DyTFunctionTriton", "dyt_triton_forward", "dyt_triton_backward"]

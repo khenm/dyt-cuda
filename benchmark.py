@@ -42,7 +42,7 @@ def get_inputs(N, num_features, device='cuda'):
         line_names=['PyTorch', 'Triton', 'CUDA'],
         plot_name='dyt-benchmark',
         styles=[('blue', '-'), ('green', '-'), ('red', '-')],
-        ylabel='Latency (ms)',
+        ylabel='Throughput (Gb/s)',
         xlabel='Input Size (N)',
         args={'num_features': 4096}
     )

@@ -6,7 +6,7 @@ CUDA bindings
 void dyt_launch(torch::Tensor x, torch::Tensor out, torch::Tensor alpha, 
                 torch::Tensor weight, torch::Tensor bias);
 
-void dyt_forward(torch::Tensor x, torch::Tensor alpha,
+torch::Tensor dyt_forward(torch::Tensor x, torch::Tensor alpha,
                 torch::Tensor weight, torch::Tensor bias)
 {
     TORCH_CHECK(x.is_cuda(), "x must be a CUDA tensor");

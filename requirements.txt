@@ -7,3 +7,6 @@ flake8
 flake8-pyproject
 matplotlib
 seaborn
+transformers
+pandas
+datasets

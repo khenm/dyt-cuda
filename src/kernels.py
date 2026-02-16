@@ -4,7 +4,7 @@ DyT implemented with Triton
 import torch
 import triton 
 import triton.language as tl
-import triton.language.libdevice as libdevice
+from triton.language.extra import libdevice
 
 @triton.jit
 def dyt_kernel(

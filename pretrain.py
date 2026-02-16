@@ -6,6 +6,7 @@ import matplotlib.pyplot as platform
 import seaborn as sns 
 import logging 
 from benchmarking.engine import run_benchmark, plot_performance
+from benchmark import seed_everything
 
 sys.path.append(os.path.join(os.getcwd(), 'benchmarking'))
 
@@ -23,8 +24,11 @@ def main():
     parser.add_argument('--max-secs', type=int, default=5, help="Audio duration per sample in seconds.")
     parser.add_argument('--steps', type=int, default=50, help="Number of steps to benchmark.")
     parser.add_argument('--output', type=str, default='results/dyt_benchmark_results.png', help="Path to save the results plot.")
+    parser.add_argument('--seed', type=int, default=42)
 
     args = parser.parse_args()
+
+    seed_everything(args.seed)
 
     if args.backend == 'all':
         backends = ['baseline', 'torch', 'triton', 'cuda']

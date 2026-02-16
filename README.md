@@ -12,6 +12,8 @@ $$
 
 referenced the following paper: [Transformers without Normalization](https://arxiv.org/abs/2503.10622). CVPR 2025. [Jiachen Zhu](https://jiachenzhu.github.io), [Xinlei Chen](https://xinleic.xyz/), [Kaiming He](https://people.csail.mit.edu/kaiming/), [Yann LeCun](http://yann.lecun.com) and [Zhuang Liu](https://liuzhuang13.github.io). FAIR, NYU, MIT, Princeton [[`arXiv`](https://arxiv.org/abs/2503.10622)][[`project page`](https://jiachenzhu.github.io/DyT/)]
 
+Our Cuda implementation can be found in `/csrc` folder and Triton implementation in `/dyt`.
+
 ### Benchmark Results
 We benchmark the forward and backward throughput of Cuda DyT compared with Triton and Pytorch efficiency. 
 | | |

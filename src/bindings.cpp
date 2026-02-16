@@ -27,7 +27,7 @@ torch::Tensor dyt_forward(torch::Tensor x, torch::Tensor alpha,
     return out;
 }
 
-torch::Tensor dyt_backward(torch::Tensor grad_output, torch::Tensor x, torch::Tensor alpha,
+std::vector<torch::Tensor> dyt_backward(torch::Tensor grad_output, torch::Tensor x, torch::Tensor alpha,
                         torch::Tensor weight) {
     TORCH_CHECK(grad_output.is_cuda(), "grad_output must be a CUDA tensor");
     TORCH_CHECK(x.is_cuda(), "x must be a CUDA tensor");

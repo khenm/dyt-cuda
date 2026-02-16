@@ -1,6 +1,6 @@
 import os
 import torch
-from datasets import load_dataset
+from datasets import load_dataset, concatenate_datasets
 import logging
 import time
 import math
@@ -15,7 +15,13 @@ logger = logging.getLogger(__name__)
 
 def get_librispeech_batch(batch_size=4, max_secs=10):
     try: 
-        dataset = load_dataset("librispeech_asr", "clean", split="train.100+train.360", streaming=True)
+        ds_clean = load_dataset("librispeech_asr", "clean", streaming=True)
+        ds_other = load_dataset("librispeech_asr", "other", streaming=True)
+        dataset = concatenate_datasets([
+            ds_clean["train.100"], 
+            ds_clean["train.360"], 
+            ds_other["train.500"]
+        ])
         batch = []
         target_len = 16000 * max_secs # 16kHz
 

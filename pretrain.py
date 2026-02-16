@@ -45,10 +45,10 @@ def main():
             )
 
             display_names = {
-                'baseline': 'LayerNorm (Standard)',
+                'baseline': 'LayerNorm',
                 'torch': 'DyT (PyTorch)',
                 'triton': 'DyT (Triton)',
-                'cuda': 'DyT (CUDA - Ours)'
+                'cuda': 'DyT (CUDA/Ours)'
             }
 
             if metrics:

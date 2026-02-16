@@ -36,7 +36,7 @@ def get_inputs(N, num_features, device='cuda'):
 @triton.testing.perf_report(
     triton.testing.Benchmark(
         x_names=['N'],
-        x_vals=[128 * 2 ** i for i in range(0, 8)],
+        x_vals=[128 * 2 ** i for i in range(0, 10)],
         line_arg='provider',
         line_vals=['torch', 'triton', 'cuda'],
         line_names=['PyTorch', 'Triton', 'CUDA'],
@@ -52,20 +52,25 @@ def benchmark(N, num_features, provider):
     quantiles = [0.5, 0.2, 0.8]
     
     if provider == 'torch':
-       return triton.testing.do_bench(lambda: model(x), quantiles=quantiles)
+       ms, min_ms, max_ms = triton.testing.do_bench(lambda: model(x), quantiles=quantiles)
     elif provider == 'triton':
-       return triton.testing.do_bench(lambda: dyt_triton(x, alpha, weight, bias), quantiles=quantiles)
+       ms, min_ms, max_ms = triton.testing.do_bench(lambda: dyt_triton(x, alpha, weight, bias), quantiles=quantiles)
     elif provider == 'cuda':
-       return triton.testing.do_bench(lambda: dyt_cuda.forward(x, alpha, weight, bias), quantiles=quantiles)
-    
-    
+       ms, min_ms, max_ms = triton.testing.do_bench(lambda: dyt_cuda.forward(x, alpha, weight, bias), quantiles=quantiles)
+
+    def gbps(ms):
+       total_bytes = x.numel() * x.element_size() * 2
+       gbps = total_bytes * 1e-9 / (ms * 1e-3)
+       return gbps
+   
+    return gbps(ms), gbps(min_ms), gbps(max_ms)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="DyT Benchmark")
-    parser.add_argument("--num_features", type=int, default=4096)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--save-dir", type=str, default="./results")
     args = parser.parse_args()
     seed_everything(args.seed)
     os.makedirs(args.save_dir, exist_ok=True)
-    benchmark.run(print_data=True, show_plots=True, save_path=args.save_dir)
+    benchmark.run(print_data=True, show_plots=False, save_path=args.save_dir) # turn off to save plots
     

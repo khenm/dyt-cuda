@@ -45,7 +45,7 @@ torch::Tensor dyt_backward(torch::Tensor grad_output, torch::Tensor x, torch::Te
     auto grad_bias = torch::empty_like(bias_c);
 
     dyt_launch_backward(grad_output_c, x_c, alpha_c, weight_c, grad_x, grad_alpha, grad_weight, grad_bias);
-    return grad_x;
+    return {grad_x, grad_alpha, grad_weight, grad_bias};
 }
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {

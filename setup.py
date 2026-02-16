@@ -8,8 +8,8 @@ setup(
         CUDAExtension(
             name="dyt_cuda", 
             sources=[
-                "src/bindings.cpp", 
-                "src/kernels.cu"
+                "csrc/bindings.cpp", 
+                "csrc/kernels.cu"
             ], 
             extra_compile_args={
                 'cxx': ['-03'],

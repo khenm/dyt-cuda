@@ -12,9 +12,9 @@ import triton
 import triton.testing
 import matplotlib.pyplot as plt
 import seaborn as sns
-from src.kernels import dyt_triton_forward, dyt_triton_backward
-from src.torch import DyT
-from src.function import DyTFunctionCuda, DyTFunctionTriton
+from dyt.triton_ops import dyt_triton_forward, dyt_triton_backward
+from dyt.modules import DyT
+from dyt.functional import DyTFunctionCuda, DyTFunctionTriton
 import dyt_cuda
 
 

@@ -1,7 +1,7 @@
 /*
 DyT implemented with CUDA
 */
-#include <cuda.h>
+#include "dyt.h"
 #include <cuda_runtime.h>
 #include <torch/extension.h>
 
@@ -15,7 +15,7 @@ __global__ void dytForwardKernel(const float *__restrict__ x, float *__restrict_
     int n_vec = n / 4;
 
     if (idx < n_vec) {
-        float4 x_vec = reinterpret_cast<const float*>(x)[idx];
+        float4 x_vec = reinterpret_cast<const float4*>(x)[idx];
         float4 out_vec;
 
         // process 4 elements
@@ -36,19 +36,21 @@ __global__ void dytForwardKernel(const float *__restrict__ x, float *__restrict_
             else if (i == 1) out_vec.y = res;
             else if (i == 2) out_vec.z = res;
             else out_vec.w = res;
-        }
-    
-        if (idx == n_vec) {
-            int start_idx = n_vec * 4;
-            for (int i = 0; i < (n - start_idx); i++) {
-                int curr_idx = start_idx + i;
-                int feat_idx = curr_idx % num_features;
 
-                float x_val = x[curr_idx];
-                float activated = tanhf(x_val * a);
-                float res = __fmaf_rn(activated, weight[feat_idx], bias[feat_idx]);
-                out[curr_idx] = res;
-            }
+        }
+        reinterpret_cast<float4*>(out)[idx] = out_vec;
+    }
+    
+    if (idx == n_vec) {
+        int start_idx = n_vec * 4;
+        for (int i = 0; i < (n - start_idx); i++) {
+            int curr_idx = start_idx + i;
+            int feat_idx = curr_idx % num_features;
+
+            float x_val = x[curr_idx];
+            float activated = tanhf(x_val * a);
+            float res = __fmaf_rn(activated, weight[feat_idx], bias[feat_idx]);
+            out[curr_idx] = res;
         }
     }
 }

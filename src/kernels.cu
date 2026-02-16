@@ -11,21 +11,12 @@ __global__ void dytForwardKernel(const float *__restrict__ x, float *__restrict_
                            const float *__restrict__ bias,
                            const int num_features, const int n) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    int vec_idx = idx * 4; // vectorized, float4
+    float a = alpha[0];
+    int n_vec = n / 4;
 
-    if (vec_idx < n) {
-        float4 x_vec;
+    if (idx < n_vec) {
+        float4 x_vec = reinterpret_cast<const float*>(x)[idx];
         float4 out_vec;
-        float a = alpha[0];
-
-        if (vec_idx + 4 <= n) {
-            x_vec = reinterpret_cast<const float4 *>(x)[idx];
-        } else {
-            x_vec.x = x[vec_idx];
-            if (vec_idx + 1 < n) x_vec.y = x[vec_idx + 1];
-            if (vec_idx + 2 < n) x_vec.z = x[vec_idx + 2];
-        }
-
 
         // process 4 elements
         #pragma unroll
@@ -36,29 +27,27 @@ __global__ void dytForwardKernel(const float *__restrict__ x, float *__restrict_
             else if (i == 2) x_val = x_vec.z;
             else x_val = x_vec.w;
 
-            int curr_idx = vec_idx + i;
-            if (curr_idx < n) {
-                size_t feat_idx = curr_idx % num_features;
-                float activated = tanhf(x_val * a);
-                float result = __fmaf_rn(activated, weight[feat_idx], bias[feat_idx]);
+            int flat_idx = idx * 4 + i;
+            int feat_idx = flat_idx % num_features;
+            float activated = tanhf(x_val * a);
+            float res = __fmaf_rn(activated, weight[feat_idx], bias[feat_idx]);
 
-                if (i == 0) out_vec.x = result;
-                else if (i == 1) out_vec.y = result;
-                else if (i == 2) out_vec.z = result;
-                else out_vec.w = result;
-            }
+            if (i == 0) out_vec.x = res;
+            else if (i == 1) out_vec.y = res;
+            else if (i == 2) out_vec.z = res;
+            else out_vec.w = res;
         }
     
-        if (vec_idx + 4 <= n) {
-            reinterpret_cast<float4 *>(out)[idx] = out_vec;
-        } else {
-            for (int i = 0; i < n - vec_idx; i++) {
-                float res;
-                if (i == 0) res = out_vec.x;
-                else if (i == 1) res = out_vec.y;
-                else if (i == 2) res = out_vec.z;
-                else res = out_vec.w;
-                out[vec_idx + i] = res;
+        if (idx == n_vec) {
+            int start_idx = n_vec * 4;
+            for (int i = 0; i < (n - start_idx); i++) {
+                int curr_idx = start_idx + i;
+                int feat_idx = curr_idx % num_features;
+
+                float x_val = x[curr_idx];
+                float activated = tanhf(x_val * a);
+                float res = __fmaf_rn(activated, weight[feat_idx], bias[feat_idx]);
+                out[curr_idx] = res;
             }
         }
     }
@@ -126,8 +115,11 @@ void dyt_launch_forward(torch::Tensor x, torch::Tensor out,
                 torch::Tensor alpha, torch::Tensor weight, torch::Tensor bias) {
     int n = x.numel();
     int num_features = x.size(-1); // feat_dim at -1
-    int threads = 256;
-    int blocks = (n + threads - 1) / threads;
+    int n_vec = n / 4;
+    int total_threads_needed = n_vec + 1;
+
+    int threads = 512;
+    int blocks = (total_threads_needed + threads - 1) / threads;
 
     // launch the kernel
     dytForwardKernel<<<blocks, threads>>>(x.data_ptr<float>(), out.data_ptr<float>(),
@@ -141,7 +133,7 @@ void dyt_launch_backward(torch::Tensor grad_output, torch::Tensor x, torch::Tens
                         torch::Tensor grad_weight, torch::Tensor grad_bias) {
     int n = x.numel();
     int num_features = x.size(-1);
-    int threads = 256;
+    int threads = 512;
     int blocks = (n + threads - 1) / threads;
 
     size_t shared_mem_size = threads * sizeof(float);

@@ -30,7 +30,7 @@ def seed_everything(seed: int = 42):
 
 
 def get_inputs(N, num_features, device="cuda"):
-    x = torch.randn((N, num_features), device=device, dtype=torch.float32)
+    x = torch.randn((N, num_features), device=device, dtype=torch.float32, requires_grad=True)
     model = DyT(num_features=num_features).to(device)
     alpha = model.alpha.detach().clone().requires_grad_(True)
     weight = model.weight.detach().clone().requires_grad_(True)
@@ -123,7 +123,7 @@ def benchmark_backward(N, num_features, provider):
     quantiles = [0.5, 0.2, 0.8]
 
     if provider == "torch":
-        y = model(x)
+        y = torch.tanh(x * alpha) * weight + bias
         ms, min_ms, max_ms = triton.testing.do_bench(
             lambda: torch.autograd.grad(y, (x, alpha, weight, bias), grad_output, retain_graph=True),
             quantiles=quantiles

@@ -60,7 +60,7 @@ def run_benchmark(backend='torch', batch_size=4, seq_secs=5, steps=50):
     inputs = get_librispeech_batch(batch_size, max_secs=seq_secs).to(device)
 
     # wav2vec2 down by 320
-    feature_len = inputs.shape[1] // 320
+    feature_len = model.wav2vec2._get_feat_extract_output_lengths(inputs.shape[1])
     mask_time_indices = torch.randint(0, 2, (inputs.shape[0], feature_len), device=device, dtype=torch.bool)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)

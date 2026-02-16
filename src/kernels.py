@@ -3,7 +3,8 @@ DyT implemented with Triton
 """
 import torch
 import triton 
-import triton.language as tl 
+import triton.language as tl
+import triton.language.extra as libdevice
 
 @triton.jit
 def dyt_kernel(
@@ -27,7 +28,7 @@ def dyt_kernel(
     weight = tl.load(weight_ptr + feat_offsets, mask=mask)
     bias = tl.load(bias_ptr + feat_offsets, mask=mask)
     
-    activated = tl.tanh(x * alpha)
+    activated = libdevice.tanh(x * alpha)
     result = activated * weight + bias
     tl.store(out_ptr + offsets, result, mask=mask)
     

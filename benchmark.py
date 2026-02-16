@@ -65,5 +65,5 @@ if __name__ == "__main__":
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
     seed_everything(args.seed)
-    benchmark.run(print_data=True, show_plots=True)
+    benchmark.run(print_data=True, show_plots=True, save_path="./results")
     

@@ -2,6 +2,7 @@
 CUDA bindings
 */
 #include <torch/extension.h>
+#include <vector>
 #include "dyt.h"
 
 torch::Tensor dyt_forward(torch::Tensor x, torch::Tensor alpha,

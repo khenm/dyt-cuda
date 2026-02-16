@@ -15,11 +15,11 @@ class Wav2VecDyT(nn.Module):
         self.layer_norm = DyT(config.hidden_size, backend=backend)
         self.final_layer_norm = DyT(config.hidden_size, backend=backend)
 
-    def forward(self, hidden_states, attn_mask=None, output_attn=False):
+    def forward(self, hidden_states, attention_mask=None, output_attentions=False):
         attn_output = self.attention(
             hidden_states,
-            attention_mask=attn_mask,
-            output_attentions=output_attn
+            attention_mask=attention_mask,
+            output_attentions=output_attentions
         )
 
         if isinstance(attn_output, tuple):

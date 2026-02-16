@@ -59,14 +59,16 @@ def run_benchmark(backend='torch', batch_size=4, seq_secs=5, steps=50):
 
     inputs = get_librispeech_batch(batch_size, max_secs=seq_secs).to(device)
 
-    mask_time_indices = torch.zeros(inputs.shape, dtype=torch.long, device=device)
+    # wav2vec2 down by 320
+    feature_len = inputs.shape[1] // 320
+    mask_time_indices = torch.randint(0, 2, (inputs.shape[0], feature_len), device=device, dtype=torch.bool)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
 
     # warmup
     logger.info("Warm up epochs...")
     for _ in range(5):
-        loss = model(inputs).loss
+        loss = model(inputs, mask_time_indices=mask_time_indices).loss
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
@@ -81,7 +83,7 @@ def run_benchmark(backend='torch', batch_size=4, seq_secs=5, steps=50):
 
     start_event.record()
     for _ in range(steps):
-        outputs = model(inputs)
+        outputs = model(inputs, mask_time_indices=mask_time_indices)
         loss = outputs.loss
         loss.backward()
         optimizer.step()

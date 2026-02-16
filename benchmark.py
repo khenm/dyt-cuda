@@ -15,7 +15,7 @@ import seaborn as sns
 from dyt.triton_ops import dyt_triton_forward, dyt_triton_backward
 from dyt.modules import DyT
 from dyt.functional import DyTFunctionCuda, DyTFunctionTriton
-import dyt
+import dyt_cuda
 
 
 def seed_everything(seed: int = 42):

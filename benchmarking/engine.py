@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 def get_librispeech_batch(batch_size=4, max_secs=10):
     try: 
-        dataset = load_dataset("librispeech_asr", "clean", split="train.100", streaming=True)
+        dataset = load_dataset("librispeech_asr", "clean", split="train.100+train.360", streaming=True)
         batch = []
         target_len = 16000 * max_secs # 16kHz
 
